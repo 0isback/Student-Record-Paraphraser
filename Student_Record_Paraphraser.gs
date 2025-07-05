@@ -5,7 +5,7 @@ function createBatchPrompt(batch) {
 
 function batchParaphrase(prompt, count) {
   const apiKey = PropertiesService.getScriptProperties().getProperty("OPENAI_API_KEY"); 
-  // 개인 OPENAI_API_KEY 를 Apps Script '스크립트 속성'으로 추가해서 사용하면 됩니다.
+  /* 개인 OPENAI_API_KEY 를 Apps Script '스크립트 속성'으로 추가해서 사용하면 됩니다. */
 
   if (!apiKey) throw new Error("OpenAI API 키가 없습니다.");
 
@@ -47,7 +47,6 @@ function onParaphraseButtonClick() {
   const outputRange = sheet.getRange("H3:H52");
   const statusCell = sheet.getRange("G1");
 
-  // 초기화
   outputRange.clearContent();
   statusCell.setValue("처리 시작...");
   SpreadsheetApp.flush();
@@ -78,7 +77,6 @@ function onParaphraseButtonClick() {
       return;
     }
 
-    // 결과 쓰기
     for (let j = 0; j < batch.length; j++) {
       const row = batch[j].index + 1;
       outputRange.getCell(row, 1).setValue(paraphrasedList[j]);
@@ -110,12 +108,10 @@ function onParaphraseButtonClick() {
     }
   }
 
-  // 완료 메시지
   statusCell.setValue("전체 문장 처리 완료!");
   SpreadsheetApp.flush();
   Utilities.sleep(2000);
   statusCell.clearContent();
 
-  // 맨 위로 커서 복귀
   sheet.setActiveRange(sheet.getRange("H3"));
 }
