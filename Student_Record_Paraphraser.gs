@@ -1,12 +1,12 @@
 function createBatchPrompt(batch) {
   const numbered = batch.map((item, i) => `${i + 1}. ${item.text}`).join("\n");
-  return `다음 문장들을 의미는 유지하되 사용하는 어휘나 어구를 바꿔서 자연스럽게 다시 써줘.
-원래 문장들과 같이 '~함', '~해봄', '~나눔'처럼 명사형 종결어미, 흔히 말하는 '음슴체'로 바꿔줘.
-번호별로 결과를 출력해줘:\n\n${numbered}`;
+  return `다음 문장들을 의미는 유지하되 사용하는 어휘나 어구를 바꿔서 자연스럽게 다시 써줘. 원래 문장들과 같이 '~함', '~해봄', '~나눔'처럼 명사형 종결어미, 흔히 말하는 '음슴체'로 바꿔줘. 번호별로 결과를 출력해줘:\n\n${numbered}`;
 }
 
 function batchParaphrase(prompt, count) {
-  const apiKey = PropertiesService.getScriptProperties().getProperty("OPENAI_API_KEY");
+  const apiKey = PropertiesService.getScriptProperties().getProperty("OPENAI_API_KEY"); 
+  // 개인 OPENAI_API_KEY 를 Apps Script '스크립트 속성'으로 추가해서 사용하면 됩니다.
+
   if (!apiKey) throw new Error("OpenAI API 키가 없습니다.");
 
   const payload = {
@@ -49,7 +49,7 @@ function onParaphraseButtonClick() {
 
   // 초기화
   outputRange.clearContent();
-  statusCell.setValue("🔄 처리 시작...");
+  statusCell.setValue("처리 시작...");
   SpreadsheetApp.flush();
 
   const inputValues = inputRange.getValues().map(row => row[0]);
@@ -59,7 +59,7 @@ function onParaphraseButtonClick() {
 
   const total = validRows.length;
   if (total === 0) {
-    statusCell.setValue("⚠️ 처리할 문장이 없습니다.");
+    statusCell.setValue("처리할 문장이 없습니다.");
     return;
   }
 
@@ -73,7 +73,7 @@ function onParaphraseButtonClick() {
     const paraphrasedList = batchParaphrase(prompt, batch.length);
 
     if (!paraphrasedList) {
-      statusCell.setValue(`❌ 오류 발생: ${completed}/${total} 문장 처리됨`);
+      statusCell.setValue(`오류 발생: ${completed}/${total} 문장 처리됨`);
       SpreadsheetApp.flush();
       return;
     }
@@ -94,7 +94,7 @@ function onParaphraseButtonClick() {
     const progressBar = generateProgressBar(completed, total, 20);
 
     statusCell.setValue(
-      `🔄 진행 중: ${completed}/${total} 완료됨 ${progressBar} (남은 예상 시간: ${estSec}초)`
+      `진행 중: ${completed}/${total} 완료됨 ${progressBar} (남은 예상 시간: ${estSec}초)`
     );
     SpreadsheetApp.flush();
 
@@ -102,16 +102,16 @@ function onParaphraseButtonClick() {
     if (completed % 10 === 0) {
       const nextRow = Math.min(3 + completed, 52);
       const targetCell = sheet.getRange(`H${nextRow}`);
-      targetCell.setBackground("#fff59d"); // 연노랑
-      sheet.setActiveRange(targetCell);    // 자동 스크롤
+      targetCell.setBackground("#fff59d");
+      sheet.setActiveRange(targetCell); // 자동 스크롤
       SpreadsheetApp.flush();
       Utilities.sleep(300);
-      targetCell.setBackground(null);      // 배경 복원
+      targetCell.setBackground(null);
     }
   }
 
   // 완료 메시지
-  statusCell.setValue("✅ 전체 문장 처리 완료!");
+  statusCell.setValue("전체 문장 처리 완료!");
   SpreadsheetApp.flush();
   Utilities.sleep(2000);
   statusCell.clearContent();
